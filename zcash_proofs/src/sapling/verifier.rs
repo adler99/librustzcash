@@ -1,3 +1,4 @@
+use slog::{Logger};
 use bellman::{
     gadgets::multipack,
     groth16::{verify_proof, PreparedVerifyingKey, Proof},
@@ -10,6 +11,7 @@ use zcash_primitives::{
     transaction::components::Amount,
 };
 
+
 use super::compute_value_balance;
 
 fn is_small_order<Order>(p: &edwards::Point<Bls12, Order>, params: &JubjubBls12) -> bool {
@@ -20,13 +22,21 @@ fn is_small_order<Order>(p: &edwards::Point<Bls12, Order>, params: &JubjubBls12)
 pub struct SaplingVerificationContext {
     // (sum of the Spend value commitments) - (sum of the Output value commitments)
     cv_sum: edwards::Point<Bls12, Unknown>,
+    /// Logger
+    log: slog::Logger,
 }
 
 impl SaplingVerificationContext {
     /// Construct a new context to be used with a single transaction.
-    pub fn new() -> Self {
+    pub fn new<L>(log: L) -> Self 
+    where
+        L: Into<Option<Logger>>, {
+             let log = log
+            .into()
+            .unwrap_or_else(|| Logger::root(slog::Discard, o!()));
         SaplingVerificationContext {
             cv_sum: edwards::Point::zero(),
+            log: log,
         }
     }
 

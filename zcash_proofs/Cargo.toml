@@ -20,6 +20,7 @@ ff = { version = "0.6", path = "../ff" }
 pairing = { version = "0.16", path = "../pairing" }
 rand_core = "0.5.1"
 zcash_primitives = { version = "0.2", path = "../zcash_primitives" }
+slog = "^2.5"
 
 [dev-dependencies]
 rand_xorshift = "0.2"
