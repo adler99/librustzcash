@@ -1,3 +1,4 @@
+use slog::{Logger,Discard};
 use bellman::{
     gadgets::multipack,
     groth16::{create_random_proof, verify_proof, Parameters, PreparedVerifyingKey, Proof},
@@ -154,7 +155,7 @@ impl SaplingProvingContext {
         }
 
         // Verify the proof
-        match verify_proof(verifying_key, &proof, &public_input[..]) {
+        match verify_proof(verifying_key, &proof, &public_input[..], Logger::root(Discard, o!())) {
             // No error, and proof verification successful
             Ok(true) => {}
 

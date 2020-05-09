@@ -1,5 +1,5 @@
 //! APIs for creating and verifying Sprout proofs.
-
+use slog::{Logger,Discard};
 use bellman::{
     gadgets::multipack,
     groth16::{self, create_random_proof, Parameters, PreparedVerifyingKey, Proof},
@@ -169,7 +169,7 @@ pub fn verify_proof(
     };
 
     // Verify the proof
-    match groth16::verify_proof(verifying_key, &proof, &public_input[..]) {
+    match groth16::verify_proof(verifying_key, &proof, &public_input[..], Logger::root(Discard, o!())) {
         // No error, and proof verification successful
         Ok(true) => true,
 

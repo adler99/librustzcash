@@ -1,4 +1,6 @@
 use slog::{Logger};
+use hex;
+
 use bellman::{
     gadgets::multipack,
     groth16::{verify_proof, PreparedVerifyingKey, Proof},
@@ -54,6 +56,8 @@ impl SaplingVerificationContext {
         verifying_key: &PreparedVerifyingKey<Bls12>,
         params: &JubjubBls12,
     ) -> bool {
+        let log = self.log.new(o!("check_spend_with_nullifier" => hex::encode(nullifier)));
+
         if is_small_order(&cv, params) {
             return false;
         }
@@ -115,8 +119,10 @@ impl SaplingVerificationContext {
             public_input[6] = nullifier[1];
         }
 
+        info!(log, "verify_proof_parameters"; "public_input" => ?public_input);
+
         // Verify the proof
-        match verify_proof(verifying_key, &zkproof, &public_input[..]) {
+        match verify_proof(verifying_key, &zkproof, &public_input[..], log) {
             // No error, and proof verification successful
             Ok(true) => true,
 
@@ -169,7 +175,7 @@ impl SaplingVerificationContext {
         public_input[4] = cm;
 
         // Verify the proof
-        match verify_proof(verifying_key, &zkproof, &public_input[..]) {
+        match verify_proof(verifying_key, &zkproof, &public_input[..], self.log.clone()) {
             // No error, and proof verification successful
             Ok(true) => true,
 

@@ -24,6 +24,8 @@ use ff::{Field, PrimeField, ScalarEngine, SqrtField};
 use group::{CurveAffine, CurveOps, CurveOpsOwned, CurveProjective};
 use subtle::CtOption;
 
+use std::fmt::Debug;
+
 /// An "engine" is a collection of types (fields, elliptic curve groups, etc.)
 /// with well-defined relationships. In particular, the G1/G2 curve groups are
 /// of prime order `r`, and are equipped with a bilinear pairing function.
@@ -98,7 +100,7 @@ pub trait Engine: ScalarEngine {
 /// Affine representation of an elliptic curve point that can be used
 /// to perform pairings.
 pub trait PairingCurveAffine: CurveAffine {
-    type Prepared: Clone + Send + Sync + 'static;
+    type Prepared: Debug + Clone + Send + Sync + 'static;
     type Pair: PairingCurveAffine<Pair = Self>;
     type PairingResult: Field;
 

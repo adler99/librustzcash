@@ -1,3 +1,5 @@
+use slog::{Logger};
+
 use ff::PrimeField;
 use group::{CurveAffine, CurveProjective};
 use pairing::{Engine, PairingCurveAffine};
@@ -23,6 +25,7 @@ pub fn verify_proof<'a, E: Engine>(
     pvk: &'a PreparedVerifyingKey<E>,
     proof: &Proof<E>,
     public_inputs: &[E::Fr],
+    log: Logger,
 ) -> Result<bool, SynthesisError> {
     if (public_inputs.len() + 1) != pvk.ic.len() {
         return Err(SynthesisError::MalformedVerifyingKey);
@@ -41,6 +44,8 @@ pub fn verify_proof<'a, E: Engine>(
     // or equivalently:
     // A * B + inputs * (-gamma) + C * (-delta) = alpha * beta
     // which allows us to do a single final exponentiation.
+
+    info!(log, "verify_proof"; "a" => ?proof.a, "b" => ?proof.b, "c" => ?proof.c, "acc" => ?&acc.into_affine(), "pvk.neg_gamma_g2" => ?pvk.neg_gamma_g2, "pvk.neg_delta_g2" => ?pvk.neg_delta_g2, "pvk.alpha_g1_beta_g2" => ?pvk.alpha_g1_beta_g2);
 
     Ok(E::final_exponentiation(&E::miller_loop(
         [
