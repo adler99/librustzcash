@@ -45,9 +45,8 @@ pub fn verify_proof<'a, E: Engine>(
     // A * B + inputs * (-gamma) + C * (-delta) = alpha * beta
     // which allows us to do a single final exponentiation.
 
-    info!(log, "verify_proof"; "a" => ?proof.a, "b" => ?proof.b, "c" => ?proof.c, "acc" => ?&acc.into_affine(), "pvk.neg_gamma_g2" => ?pvk.neg_gamma_g2, "pvk.neg_delta_g2" => ?pvk.neg_delta_g2, "pvk.alpha_g1_beta_g2" => ?pvk.alpha_g1_beta_g2);
-
-    Ok(E::final_exponentiation(&E::miller_loop(
+    
+    let left_side = E::final_exponentiation(&E::miller_loop(
         [
             (&proof.a.prepare(), &proof.b.prepare()),
             (&acc.into_affine().prepare(), &pvk.neg_gamma_g2),
@@ -55,6 +54,9 @@ pub fn verify_proof<'a, E: Engine>(
         ]
         .iter(),
     ))
-    .unwrap()
-        == pvk.alpha_g1_beta_g2)
+    .unwrap();
+
+    info!(log, "verify_proof"; "a" => ?proof.a, "b" => ?proof.b, "c" => ?proof.c, "acc" => ?&acc.into_affine(), "pvk.neg_gamma_g2" => ?pvk.neg_gamma_g2, "pvk.neg_delta_g2" => ?pvk.neg_delta_g2, "pvk.alpha_g1_beta_g2" => ?pvk.alpha_g1_beta_g2, "left_side_result" => ?left_side);
+
+    Ok(left_side == pvk.alpha_g1_beta_g2)
 }
