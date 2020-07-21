@@ -72,8 +72,13 @@ impl Hashable for Node {
     }
 
     fn combine(depth: usize, lhs: &Self, rhs: &Self) -> Self {
+        let merkle_hash = merkle_hash(depth, &lhs.repr, &rhs.repr);
+        //println!("Node combine for lhs {:?}, rhs {:?}. merkle_hash: {:?}", lhs.repr, rhs.repr, merkle_hash);
+
+        println!("l:{:?}-->l:{:?}", lhs.repr, merkle_hash);
+        println!("r:{:?}-->l:{:?}", rhs.repr, merkle_hash);
         Node {
-            repr: merkle_hash(depth, &lhs.repr, &rhs.repr),
+            repr: merkle_hash
         }
     }
 

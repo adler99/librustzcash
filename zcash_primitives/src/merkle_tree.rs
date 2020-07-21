@@ -181,7 +181,10 @@ impl<Node: Hashable> CommitmentTree<Node> {
 
         // 3) Hash in roots of the empty subtrees up to the final depth.
         ((self.parents.len() + 1)..depth)
-            .fold(mid_root, |root, d| Node::combine(d, &root, &filler.next(d)))
+            .fold(mid_root, |root, d| {
+                println!("Depth: {:?}", d);
+                Node::combine(d, &root, &filler.next(d))
+                })
     }
 }
 

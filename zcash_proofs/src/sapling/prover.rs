@@ -1,4 +1,3 @@
-use slog::{Logger,Discard};
 use bellman::{
     gadgets::multipack,
     groth16::{create_random_proof, verify_proof, Parameters, PreparedVerifyingKey, Proof},
@@ -6,6 +5,7 @@ use bellman::{
 use ff::Field;
 use pairing::bls12_381::{Bls12, Fr};
 use rand_core::OsRng;
+use slog::{Discard, Logger};
 use std::ops::{AddAssign, Neg};
 use zcash_primitives::{
     jubjub::{edwards, fs::Fs, FixedGenerators, JubjubBls12, Unknown},
@@ -155,11 +155,20 @@ impl SaplingProvingContext {
         }
 
         // Verify the proof
-        match verify_proof(verifying_key, &proof, &public_input[..], Logger::root(Discard, o!())) {
+        match verify_proof(
+            verifying_key,
+            &proof,
+            &public_input[..],
+            Logger::root(Discard, o!()),
+        ) {
             // No error, and proof verification successful
             Ok(true) => {}
 
             // Any other case
+            Err(e) => {
+                eprint!("proof generation failed: {:}", e.to_string());
+                return Err(());
+            }
             _ => {
                 return Err(());
             }
